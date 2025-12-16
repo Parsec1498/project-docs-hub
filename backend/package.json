@@ -1,0 +1,22 @@
+{
+  "name": "project-docs-backend",
+  "version": "0.1.0",
+  "description": "GraphQL API for Project Docs Hub prototype",
+  "main": "index.js",
+  "type": "commonjs",
+  "scripts": {
+    "start": "node index.js",
+    "dev": "nodemon index.js"
+  },
+  "dependencies": {
+    "apollo-server-express": "^3.11.1",
+    "cors": "^2.8.5",
+    "express": "^4.18.2",
+    "graphql": "^16.6.0",
+    "lowdb": "^7.0.1",
+    "nanoid": "^3.3.4"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.22"
+  }
+}
