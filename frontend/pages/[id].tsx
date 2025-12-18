@@ -24,8 +24,8 @@ const PAGE_QUERY = gql`
 `;
 
 const UPDATE_PAGE_MUTATION = gql`
-  mutation UpdatePage($id: ID!, $title: String, $slug: String, $content: String) {
-    updatePage(id: $id, title: $title, slug: $slug, content: $content) {
+  mutation UpdatePage($id: ID!, $input: PageUpdateInput!) {
+    updatePage(id: $id, input: $input) {
       id
       title
       slug
@@ -74,7 +74,16 @@ export default function Page() {
   const handleSave = async () => {
     if (!data || !data.page) return;
     const newContent = editor ? editor.getHTML() : '';
-    await updatePage({ variables: { id: data.page.id, title: form.title, slug: form.slug, content: newContent } });
+    await updatePage({
+      variables: {
+        id: data.page.id,
+        input: {
+          title: form.title,
+          slug: form.slug,
+          content: newContent,
+        },
+      },
+    });
     setEditMode(false);
     refetch();
   };
