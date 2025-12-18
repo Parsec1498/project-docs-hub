@@ -74,18 +74,29 @@ export default function Page() {
   const handleSave = async () => {
     if (!data || !data.page) return;
     const newContent = editor ? editor.getHTML() : '';
-    await updatePage({
-      variables: {
-        id: data.page.id,
-        input: {
-          title: form.title,
-          slug: form.slug,
-          content: newContent,
+    try {
+      await updatePage({
+        variables: {
+          id: data.page.id,
+          input: {
+            title: form.title,
+            slug: form.slug,
+            content: newContent,
+          },
         },
-      },
-    });
-    setEditMode(false);
-    refetch();
+      });
+      setEditMode(false);
+      refetch();
+    } catch (err: any) {
+      // Log detailed Apollo error to help diagnose 400s from the GraphQL API
+      console.error('Update page error', err);
+      if (err?.graphQLErrors) {
+        console.error('GraphQL errors:', err.graphQLErrors);
+      }
+      if (err?.networkError) {
+        console.error('Network error:', err.networkError);
+      }
+    }
   };
 
   const handleCancel = () => {
