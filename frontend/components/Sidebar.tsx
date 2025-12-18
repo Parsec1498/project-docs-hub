@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useRouter } from 'next/router';
 import Link from 'next/link';
 import { gql, useQuery, useMutation } from '@apollo/client';
 import { useAuth } from '../utils/authContext';
@@ -63,30 +64,39 @@ function RenderPages({ pages, level }: { pages: PageNode[]; level: number }) {
 }
 
 export default function Sidebar() {
+  const router = useRouter();
   const { data, loading, error, refetch } = useQuery(PAGES_QUERY, {
     variables: { parentId: null },
   });
-  const { user } = useAuth();
+  const { user, logout } = useAuth();
   const [showForm, setShowForm] = useState(false);
   const [formData, setFormData] = useState({ title: '', slug: '', type: 'page' });
   const [createPage] = useMutation(CREATE_PAGE_MUTATION);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    await createPage({
-      variables: {
-        input: {
-          title: formData.title,
-          slug: formData.slug,
-          content: '',
-          parentId: null,
-          type: formData.type,
+    try {
+      await createPage({
+        variables: {
+          input: {
+            title: formData.title,
+            slug: formData.slug,
+            content: '',
+            parentId: null,
+            type: formData.type,
+          },
         },
-      },
-    });
-    setFormData({ title: '', slug: '', type: 'page' });
-    setShowForm(false);
-    refetch();
+      });
+      setFormData({ title: '', slug: '', type: 'page' });
+      setShowForm(false);
+      refetch();
+    } catch (err: any) {
+      console.error(err);
+      if (err?.message?.includes('Not authenticated')) {
+        logout();
+        router.push('/login');
+      }
+    }
   };
 
   if (loading) return <div>Loading…</div>;
