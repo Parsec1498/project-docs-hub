@@ -31,8 +31,8 @@ const PAGES_QUERY = gql`
 `;
 
 const CREATE_PAGE_MUTATION = gql`
-  mutation CreatePage($title: String!, $slug: String!, $content: String!, $parentId: ID, $type: String!) {
-    createPage(title: $title, slug: $slug, content: $content, parentId: $parentId, type: $type) {
+  mutation CreatePage($input: PageCreateInput!) {
+    createPage(input: $input) {
       id
       title
       slug
@@ -73,7 +73,17 @@ export default function Sidebar() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    await createPage({ variables: { title: formData.title, slug: formData.slug, content: '', parentId: null, type: formData.type } });
+    await createPage({
+      variables: {
+        input: {
+          title: formData.title,
+          slug: formData.slug,
+          content: '',
+          parentId: null,
+          type: formData.type,
+        },
+      },
+    });
     setFormData({ title: '', slug: '', type: 'page' });
     setShowForm(false);
     refetch();
