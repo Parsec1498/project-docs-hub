@@ -1,4 +1,5 @@
 const path = require('path');
+const fs = require('fs');
 const express = require('express');
 const cors = require('cors');
 const { ApolloServer, gql } = require('apollo-server-express');
@@ -8,7 +9,14 @@ const { LowSync } = require('lowdb');
 const { JSONFileSync } = require('lowdb/node');
 
 // --- DB (lowdb) ---
-const dbFile = path.join(__dirname, 'db.json');
+// IMPORTANT: keep DB file outside of the git-tracked source tree so that
+// `git pull` or deploys do not wipe runtime data (pages, users, etc.).
+// You can override the location with the DB_FILE env variable.
+const defaultDataDir = path.join(__dirname, '..', 'data');
+if (!fs.existsSync(defaultDataDir)) {
+  fs.mkdirSync(defaultDataDir, { recursive: true });
+}
+const dbFile = process.env.DB_FILE || path.join(defaultDataDir, 'db.json');
 const adapter = new JSONFileSync(dbFile);
 const db = new LowSync(adapter, { users: [], pages: [] });
 
@@ -58,7 +66,7 @@ function slugify(s) {
     .trim()
     .toLowerCase()
     .replace(/['"]/g, '')
-    .replace(/[^a-z0-9à-ÿ³¿º´\-_\s]/gi, '')
+    .replace(/[^a-z0-9ï¿½-ï¿½ï¿½ï¿½ï¿½ï¿½\-_\s]/gi, '')
     .replace(/\s+/g, '-')
     .replace(/-+/g, '-')
     .replace(/^-|-$/g, '');
